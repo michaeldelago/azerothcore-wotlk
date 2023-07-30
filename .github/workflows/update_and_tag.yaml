@@ -5,14 +5,20 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
-  # schedule:
-    # - cron: '0 0 * * *' # midnight
+  schedule:
+    - cron: '0 0 * * *' # midnight
 
 jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - run: |
+          gh repo sync azerothcore/azerothcore-wotlk --source azerothcore/azerothcore-wotlk
+
   tag:
     runs-on: ubuntu-latest
     steps:
