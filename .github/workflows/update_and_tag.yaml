@@ -1,19 +1,18 @@
 name: Sync Fork
 
+concurrency:
+  group: tag-bump
+  cancel-in-progress: true
+
 on:
-  schedule:
-    - cron: '0 0 * * *' # midnight
+  push:
+    branches:
+      - master
   workflow_dispatch:
+  # schedule:
+    # - cron: '0 0 * * *' # midnight
 
 jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: tgymnich/fork-sync@v1.8
-        with:
-          owner: azerothcore
-          base: master
-          head: master
   tag:
     runs-on: ubuntu-latest
     needs: sync
