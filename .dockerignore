@@ -1,14 +1,28 @@
-/cmake-build-debug/*
-/build*/
-/var/*
-!/var/build/.gitkeep
-!/var/ccache/.gitkeep
-/env/dist/*
-!/env/dist/.gitkeep
-/env/user/*
-/.env*
-.idea
-!.gitkeep
+# Ignore everything
+*
 
-# do not ignore the ccache folder (used by the ci)
-!/var/docker/ccache
+!/CMakeLists.txt
+!/src
+!/deps
+!/modules
+!/conf/dist/config.cmake
+
+# .git isn't ignored but it should be used with caution
+# At time of writing, the .git dir is 1.2GB on a full-depth checkout with a few
+# branches
+#
+# .git is used during the build process since cmake versions the binaries with
+# the git commits
+# If you need to use the git data for something, the way to do that is to prefix
+# your RUN command with a bind mount:
+#
+#    RUN --mount=type=bind,target=/azerothcore/.git,source=.git \
+#        git status
+
+!/.git
+
+# data has sql files that is exclusively used in the dbimport
+!/data/sql
+
+# apps contains the scripts for initializing client-data
+!/apps
