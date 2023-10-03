@@ -124,7 +124,7 @@ RUN apt update && \
       gettext-base default-mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/dist/etc
+COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc
 
 VOLUME /azerothcore/env/dist/etc
 

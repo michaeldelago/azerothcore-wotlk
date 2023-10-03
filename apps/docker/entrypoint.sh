@@ -17,6 +17,8 @@ function fix_module_sql_paths() {
     fi
 }
 
+cp -rnv /azerothcore/env/ref/etc/* /azerothcore/env/dist/etc
+
 if [[ "$ACORE_COMPONENT" == "dbimport" ]]; then
     fix_module_sql_paths "auth"
     fix_module_sql_paths "world"
