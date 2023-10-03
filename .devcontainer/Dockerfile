@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS dev-server
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -15,6 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # install the required dependencies to run the server
 RUN --mount=target=/var/cache/apt,type=cache \
+    # This is enough large dependencies where it makes sense to cache them
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     apt-get update && \
     apt-get install -y \
