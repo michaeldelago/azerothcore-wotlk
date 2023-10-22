@@ -18,37 +18,41 @@
 #include "Realm.h"
 #include "IpAddress.h"
 #include "IpNetwork.h"
+#include "Log.h"
+#include "Config.h"
 #include <boost/asio/ip/tcp.hpp>
 
 boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::address const& clientAddr) const
 {
     boost::asio::ip::address realmIp;
 
+    // true if Network.AnyPrivateClientIsLocal and the client's IP address is a
+    // part of a RFC 1918 private network
+    // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_addresses
+    bool clientAddrIsPrivate = sConfigMgr->GetOption<bool>("AnyPrivateClientIsLocal", false) &&
+        clientAddr.is_v4() &&
+        (Acore::Net::IsInNetwork(Acore::Net::make_address_v4("10.0.0.0"), Acore::Net::make_address_v4("255.0.0.0"), clientAddr.to_v4()) ||
+         Acore::Net::IsInNetwork(Acore::Net::make_address_v4("172.12.0.0"), Acore::Net::make_address_v4("255.240.0.0"), clientAddr.to_v4()) ||
+         Acore::Net::IsInNetwork(Acore::Net::make_address_v4("192.168.0.0"), Acore::Net::make_address_v4("255.255.0.0"), clientAddr.to_v4()));
+
+    // true if above or the client IP is inside of the localAddress in the database
+    bool clientAddrIsLocal = clientAddr.is_v4() &&
+                           Acore::Net::IsInNetwork(LocalAddress->to_v4(), LocalSubnetMask->to_v4(), clientAddr.to_v4());
+
     // Attempt to send best address for client
-    if (clientAddr.is_loopback())
+    //
+    // Check if client Address is loopback and if the local/external address is loopback
+    if (clientAddr.is_loopback() && (LocalAddress->is_loopback() || ExternalAddress->is_loopback()))
     {
         // Try guessing if realm is also connected locally
-        if (LocalAddress->is_loopback() || ExternalAddress->is_loopback())
-        {
-            realmIp = clientAddr;
-        }
-        else
-        {
-            // Assume that user connecting from the machine that bnetserver is located on
-            // has all realms available in his local network
-            realmIp = *LocalAddress;
-        }
+        realmIp = clientAddr;
     }
-    else
-    {
-        if (clientAddr.is_v4() && Acore::Net::IsInNetwork(LocalAddress->to_v4(), LocalSubnetMask->to_v4(), clientAddr.to_v4()))
-        {
-            realmIp = *LocalAddress;
-        }
-        else
-        {
-            realmIp = *ExternalAddress;
-        }
+    // Assume that user connecting from the machine that bnetserver is located on has all realms available in their local network
+    else if (clientAddr.is_loopback() || clientAddrIsLocal || clientAddrIsPrivate) {
+        realmIp = *LocalAddress;
+    }
+    else {
+        realmIp = *ExternalAddress;
     }
 
     // Return external IP

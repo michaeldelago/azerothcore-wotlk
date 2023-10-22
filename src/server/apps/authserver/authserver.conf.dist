@@ -203,6 +203,16 @@ IPLocationFile = ""
 
 AllowLoggingIPAddressesInDatabase = 1
 
+
+#
+#    AnyPrivateClientIsLocal
+#        Description: If client IP is part of a RFC1918 Private Network, it will be treated as local
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+AnyPrivateClientIsLocal = 0
+
 #
 ###################################################################################################
 
