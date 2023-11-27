@@ -1,16 +1,16 @@
-name: check-codestyle
+name: Codestyle
 on:
   pull_request:
 
 jobs:
-  check-codestyle:
+  triage:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
-    name: check codestyle
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check core codestyle
         run: source ./apps/ci/ci-codestyle.sh
