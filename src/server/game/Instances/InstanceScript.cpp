@@ -16,6 +16,7 @@
  */
 
 #include "InstanceScript.h"
+#include "Chat.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
@@ -602,7 +603,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 
         instance->DoForAllPlayers([&, buff](Player* player)
         {
-            player->GetSession()->SendNotification("%s", buff);
+            ChatHandler(player->GetSession()).SendNotification("{}", buff);
         });
     }
 }
@@ -678,7 +679,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
     for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
     {
         if (Unit* controlled = *itr2)
-            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+            if (controlled->IsInWorld() && controlled->IsCreature())
                 controlled->CastSpell(player, spell, true);
     }
 }
