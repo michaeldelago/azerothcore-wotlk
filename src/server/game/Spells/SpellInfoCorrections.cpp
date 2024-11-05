@@ -4000,12 +4000,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
-    // Luffa
-    ApplySpellFix({ 23595 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = 1; // Remove only 1 bleed effect
-    });
-
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 2585 }, [](SpellInfo* spellInfo)
     {
@@ -4852,6 +4846,12 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     // Siphon Life (heal)
     ApplySpellFix({ 63106 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Fury
+    ApplySpellFix({ 40601 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
