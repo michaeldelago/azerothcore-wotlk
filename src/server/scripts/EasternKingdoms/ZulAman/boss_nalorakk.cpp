@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Nalorakk
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Aman
-EndScriptData */
-
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -225,7 +218,7 @@ struct boss_nalorakk : public BossAI
             context.Repeat();
         }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
         {
-            if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLEEFFECT))
+            if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLE))
             {
                 DoCastVictim(SPELL_MANGLE);
                 context.Repeat(1s);
@@ -247,9 +240,11 @@ struct boss_nalorakk : public BossAI
         if (currentlyInBearForm)
         {
             Talk(SAY_SHIFTEDTOTROLL);
-            me->RemoveAurasDueToSpell(SPELL_BEARFORM);
             scheduler.CancelGroup(GROUP_BEAR);
             _bearForm = false;
+
+            me->SetCanDualWield(true);
+
             scheduler.Schedule(15s, 20s, GROUP_HUMAN, [this](TaskContext context)
             {
                 Talk(SAY_SURGE);
@@ -279,6 +274,9 @@ struct boss_nalorakk : public BossAI
             DoCastSelf(SPELL_BEARFORM, true);
             scheduler.CancelGroup(GROUP_HUMAN);
             _bearForm = true;
+
+            me->SetCanDualWield(false);
+
             scheduler.Schedule(2s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
@@ -291,10 +289,9 @@ struct boss_nalorakk : public BossAI
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
                 context.Repeat(15s, 20s);
-            }).Schedule(25s, 30s, GROUP_BEAR, [this](TaskContext context)
+            }).Schedule(30s, GROUP_BEAR, [this](TaskContext)
             {
                 ShapeShift(_bearForm);
-                context.Repeat();
             });
         }
     }
